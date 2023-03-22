@@ -1,65 +1,59 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/types.h>
 #include <sys/wait.h>
 
-void print_array(int* array, int size){
-    printf("[");
-    int i;
-    for(i = 0; i < size; i++){
-        printf("%d ", array[i]);
+void buscar(int *vetor, int tamanho, int valor) {
+    for (int i = 0; i < tamanho; i++) 
+    {
+        if (vetor[i] == valor) 
+        {
+            exit(0);
+        }
     }
-    printf("]\n");
+    exit(1);
 }
 
-int main()
-{
 
-    int max_num = 5, tam_vet = 10, n_filhos = 3, inicio, fim, valor = 3;
+
+int main() {
+    int tam = 30, vetor[tam], n = 6; //tam -> tamanho do vetor | n -> numero de filhos
+    int valor = 5; // valor a ser procurado
+    int tamanho = sizeof(vetor) / sizeof(int);
+    int intervalo = tamanho / n; // tamanho do intervalo de cada filho
     pid_t pid;
-    int vet_full[10];
-    srand(8573);
+    srand(8343);
 
-    //Preencher vetor
-    for (int i = 0; i < tam_vet; i++)
+    for(int i = 0; i < tam; i++)
     {
-        vet_full[i] = rand() % max_num; 
+        vetor[i] = rand() % 6;
     }
-    print_array(vet_full, tam_vet);
-    int step = tam_vet/n_filhos;
-    int resto = tam_vet % n_filhos;
 
-    for(int i = 0; i < n_filhos; i++)
-    {
+
+    for (int i = 0; i < n; i++) {
         pid = fork();
-        
-
-        if(pid == 0)
-        {
-            if (i < n_filhos - 1)
+        if (pid == 0) //FILHO 
+        { 
+            int inicio = i * intervalo;
+            int fim = (i + 1) * intervalo;
+            if (i == n - 1) 
             {
-                inicio = i * step;
-                fim = inicio + step - 1;
+                fim = tamanho; // restante do vetor
             }
-            else
-            {
-                inicio = i * step;
-                fim = tam_vet - 1;
-            }
-
-            for(int j = inicio; j <= fim; j++)
-            {
-                if(vet_full[j] == valor)
-                {
-                    printf("PID: %d, %d \n", pid, j);
-                    return 1;
-                }
-            }
-        }
-        else
-        {
-            wait(NULL);
+            buscar(&vetor[inicio], fim - inicio, valor);
         }
     }
+
+    // processo pai espera os filhos terminarem
+    int status;
+    for (int i = 0; i < n; i++) 
+    {
+        wait(&status);
+        if (WIFEXITED(status) && WEXITSTATUS(status) == 0) 
+        {
+            printf("Filho %d encontrou o valor\n", waitpid(-1, &status, 0));
+        }
+    }
+
+    return 0;
 }
