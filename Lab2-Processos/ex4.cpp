@@ -4,59 +4,62 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-int main() 
-{
-    int tam_comando = 1024;
-    char comando[tam_comando];
-    
-    //Loopa igual um jogo
-    while (1) {
-        // exibe o prompt
-        printf("> ");
-        
-        // se a entrada for NULL, break;
-        if (fgets(comando, tam_comando, stdin) == NULL) 
+int main() {
+    char comando[1024];
+    char* args[64];
+    int background = 0;
+
+    while (1) 
+    {
+        printf(">> ");
+        fgets(comando, 1024, stdin);
+
+        // Impede de quebrar linha
+        comando[strcspn(comando, "\n")] = '\0';
+
+        // Quebra o comando por espaços e manda para um vetor
+        char* token = strtok(comando, " ");
+        int i = 0;
+
+        while (token != NULL) 
         {
-            break;
+            args[i++] = token;
+
+            // Vê se é pra rodar em background
+            if (strcmp(token, "&") == 0) 
+            {
+                background = 1;
+                args[i - 1] = NULL; // Remove o simbolo da lista de argumentos
+                break;
+            }
+            token = strtok(NULL, " "); // NULL para o token 
         }
-        
-        // não quebra linha
-        int len = strlen(comando);
-        if (comando[len - 1] == '\n') 
-        {
-            comando[len - 1] = '\0';
-        }
-        
-        // comando em segundo plano?
-        bool background = false;
-        if (len > 0 && comando[len - 1] == '&') 
-        {
-            background = true;
-            comando[len - 1] = '\0';
-        }
-        
-        // executa o comando em um processo filho, faz o fork
+
+        args[i] = NULL;
+
+        // Faz o fork
         pid_t pid = fork();
-        
+
         if (pid == 0) //FILHO 
         {
-            system(comando);
-            exit(EXIT_SUCCESS);
-        } 
-        else // PAI 
+            execvp(args[0], args);
+            printf("Esse comando não existe.\n");
+            exit(1);
+        }
+        else //PAI
         {
             if (!background) 
             {
-                // espera pelo filho se não estiver sendo executado em segundo plano
+                // Espera o filho acabar se não for em background
                 int status;
-                int wait = waitpid(pid, &status, 0);
-                if (wait == -1) 
-                {
-                    perror("waitpid"); // deu ruim e não retorna o pid;
-                }
+                waitpid(pid, &status, 0);
+            } 
+            else 
+            {
+                printf("Processo %d executando em background\n", pid);
             }
         }
     }
-    
-    return EXIT_SUCCESS;
+
+    return 0;
 }
