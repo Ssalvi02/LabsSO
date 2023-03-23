@@ -1,3 +1,11 @@
+/*
+    Descrição: Recebe um vetor e o divide para N filhos em partes iguais.
+    Estes filhos vão proucurar um valor e retornar o PID que acha-lo.
+    Autores: João Victor Salvi Silva
+             Gabriela Paola Sereniski
+    Data de criação: 20/03/2023
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>

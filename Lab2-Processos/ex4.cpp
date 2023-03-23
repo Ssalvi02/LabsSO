@@ -1,3 +1,12 @@
+/*
+    Descrição: Um shell simples para executar comandos Linux. O programa
+    divide o comando recebido e o aloca em um vetor para uma manipualção
+    mais fácil.
+    Autores: João Victor Salvi Silva
+             Gabriela Paola Sereniski
+    Data de criação: 20/03/2023
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
