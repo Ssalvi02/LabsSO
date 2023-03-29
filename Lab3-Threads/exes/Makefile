@@ -1,12 +1,20 @@
-CC=gcc
-CFLAGS=-I.
-DEPS = matriz.h
+CC=gcc -Wall
 
-%.o: %.c $(DEPS)
-	$(CC) -c -o $@ $< $(CFLAGS)
+P1=ex1
+P2=ex2
 
-matriz: matriz.o test_matriz.o 
-	$(CC) -o test_matriz matriz.o test_matriz.o
+PROGS=$(P1) $(P2)
 
-clean: 
-	rm *.o test_matriz
+all: $(PROGS)
+
+ex1:
+	gcc ex1.c -o ex1 -lpthread
+	
+ex2:
+	gcc ex2.c matriz.c -o ex2 -lpthread -lm
+	
+clean:
+	rm $(PROGS)
+
+clean_output:
+	rm *.txt
