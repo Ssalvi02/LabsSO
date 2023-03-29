@@ -1,3 +1,10 @@
+/*
+    Descrição: Divide um vetor em partes pequenas para procurar por valor paralelamente.
+    Autores: João Victor Salvi Silva
+             Gabriela Paola Sereniski
+    Data de criação: 29/03/2023
+*/
+
 #include<stdio.h>
 #include<pthread.h>
 
