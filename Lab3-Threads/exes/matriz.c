@@ -55,3 +55,19 @@ int** read_matrix_from_file(char* filename, int *row, int *col) {
    *row = r; *col = c;
    return m;
 }
+
+void write_matrix_to_file(char *filename, int **matrix, int row, int col) {
+   FILE *fd;
+
+   fd = fopen(filename, "w");
+
+   fprintf(fd, "%dx%d\n", row, col);
+   for(int i = 0; i < row; i++)
+   {
+      for(int j = 0; j < col; j++)
+         fprintf(fd, "%4d ", matrix[i][j]);
+      fprintf(fd, "\n");
+   }
+
+   fclose(fd);
+}

@@ -15,5 +15,8 @@ void generate_elements(int** matrix, int row, int col, int limit);
 /* lê uma matriz de um arquivo - row e col são configurados a partir do arquivo */
 int** read_matrix_from_file(char* filename, int *row, int *col);
 
+/* escreve matriz em um arquivo */
+void write_matrix_to_file(char *filename, int **matrix, int row, int col);
+
 /*  exibe uma matrix row x col */
 void print_matrix(int** matrix, int row, int col);

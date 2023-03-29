@@ -1,3 +1,10 @@
+/*
+    Descrição: Calcula média aritmética de cada linha e média geométrica de cada coluna de uma matriz.
+    Autores: João Victor Salvi Silva
+             Gabriela Paola Sereniski
+    Data de criação: 29/03/2023
+*/
+
 #include <stdio.h>   
 #include <stdlib.h>     //atoi(), srand()
 #include <time.h>       //time() 
@@ -19,6 +26,7 @@ struct data_chunk {
     int **mat;
 };
 
+// função que calcula média aritmética de cada linha
 void *a_means(void *param)
 {
     struct data_chunk *d = param;
@@ -31,6 +39,8 @@ void *a_means(void *param)
     }
 }
 
+// função que calcula média geométrica de cada coluna
+// antilog é usado para evitar overflow
 void *g_means(void *param)
 {
     struct data_chunk *d = param;
@@ -49,31 +59,30 @@ int main(int argc, char **argv)
 {
     if(argc < 2)
     {
-        printf("use: <number_of_threads>");
+        // passa número de threads pela linha de comando
+        printf("use: <number_of_threads>"); 
         exit(0);
     }
 
-    int row, col; 
-    int op;
-    int **mat;
+    int row = 20000, col = 20000; 
+    // cria matriz
+    printf("generating matrix...\n");
+    int **mat = create_matrix(row, col);
+    generate_elements(mat, row, col, 100);
+    printf("done generating matrix of size %dx%d.\n", row, col);
     
-    printf("reading matrix...\n");
-    mat = read_matrix_from_file("mat.txt", &row, &col);
-    printf("done reading matrix of size %dx%d.\n", row, col);
-
-    /*--------------------------------------------------------------------------------------*/
-
     int n_threads = atoi(argv[1]);
-
-    if(n_threads > row || n_threads > col)
-        n_threads = (row < col) ? row : col;
     
     struct data_chunk data[n_threads];
 
     struct timespec start, finish;
 
-    clock_gettime(CLOCK_MONOTONIC, &start);
+    /* ---- inicia calculo da média aritmética ---- */
 
+    // tempo de inicio do processamento
+    clock_gettime(CLOCK_MONOTONIC, &start);  
+
+    // distribui as linhas entre as threads
     int part = row/n_threads;
     int beg = 0;
     int end = part;
@@ -96,8 +105,9 @@ int main(int argc, char **argv)
     for(int i = 0; i < n_threads; i++)
         pthread_join(t[i], NULL);
 
-    /*--------------------------------------------------------------------------------------*/
+    /* ---- inicia calculo da média geométrica ---- */
 
+    //distribui as colunas entre as threads
     part = col/n_threads;
     beg = 0;
     end = part;
@@ -118,13 +128,16 @@ int main(int argc, char **argv)
     for(int i = 0; i < n_threads; i++)
         pthread_join(t[i], NULL);
 
+    // tempo de fim do processamento
     clock_gettime(CLOCK_MONOTONIC, &finish);
+    // calcula tempo total
     double elapsed = (finish.tv_sec - start.tv_sec);
     elapsed += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
     printf("time spent: %fs\n", elapsed);
 
     /*--------------------------------------------------------------------------------------*/
     
+    // escreve saída em arquivos texto
     FILE *fd;
 
     fd = fopen("ex2_arithmetic_means.txt", "w");
