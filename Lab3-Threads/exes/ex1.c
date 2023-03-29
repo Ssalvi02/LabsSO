@@ -18,19 +18,15 @@ void *buscar(void* param)
     struct data_chunk *dados = param;
 
     for(int i = dados->ini; i < dados->fim; i++)
-    {
         if(dados->vet[i] == dados->key)
-        {
-            printf("Thread %ld achou o valor na posição %d!\n", pthread_self(), i);
-        }
-    }
+            printf("Thread %ld achou o valor %d na posição %d!\n", pthread_self(), dados->key, i);
 }
 
 
 
 int main()
 {
-    int vet[TAM_VET] = {2, 3, 5, 6, 2, 8, 4, 7, 5, 11}, tamanho_parte = TAM_VET/N;
+    int vet[TAM_VET] = {2, 3, 5, 6, 2, 8, 4, 7, 5, 2}, tamanho_parte = TAM_VET/N;
     int inicial = 0, final = tamanho_parte, chave = 2;    
     
     struct data_chunk dados[N];
@@ -44,14 +40,13 @@ int main()
         dados[i].vet = vet;
         dados[i].key = chave;
 
-        pthread_create(&t[i], NULL, buscar, &dados[i]);
-        inicial = final+1;
+        inicial = final;
         final += tamanho_parte;
-        if(i == N-1)
-        {
-            final = N;
-        }
     }
+    dados[N-1].fim = TAM_VET;
+
+    for(int i = 0; i < N; i++)
+        pthread_create(&t[i], NULL, buscar, &dados[i]);
 
     for(int i = 0; i < N; i++)
     {

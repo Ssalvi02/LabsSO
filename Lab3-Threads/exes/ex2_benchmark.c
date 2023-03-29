@@ -45,53 +45,29 @@ void *g_means(void *param)
     }
 }
 
-int main()
+int main(int argc, char **argv)
 {
+    if(argc < 2)
+    {
+        printf("use: <number_of_threads>");
+        exit(0);
+    }
+
     int row, col; 
     int op;
     int **mat;
-    char filename[200];
-
-    do{
-        printf("choose what to do:\n[1] - generate matrix\n[2] - load matrix from file\n");
-        scanf("%d", &op);
-    } while(op != 1 && op != 2);
-
-    if (op == 1){
-
-        printf("select number of lines >> ");
-        scanf("%d", &row);
-        printf("select number of columns >> ");
-        scanf("%d", &col);
-
-        mat = create_matrix(row, col);
-        srand(time(NULL));  
-        generate_elements(mat, row, col, 100);
-
-        printf("select output matrix file name >> ");
-        scanf("%s", filename);
-        strcat(filename, ".in");
-        
-        write_matrix_to_file(filename, mat, row, col);
-
-    } else {
-        printf("select input matrix file >> ");
-        scanf("%s", filename);
-        printf("reading matrix...\n");
-        mat = read_matrix_from_file(filename, &row, &col);
-        printf("done reading matrix of size %dx%d.\n", row, col);
-    }
-
-    int n_threads = 16;
-    printf("select number of threads >> ");
-    scanf("%d", &n_threads);
+    
+    printf("reading matrix...\n");
+    mat = read_matrix_from_file("mat.txt", &row, &col);
+    printf("done reading matrix of size %dx%d.\n", row, col);
 
     /*--------------------------------------------------------------------------------------*/
+
+    int n_threads = atoi(argv[1]);
 
     if(n_threads > row || n_threads > col)
         n_threads = (row < col) ? row : col;
     
-    printf("number of threads: %d\n", n_threads);
     struct data_chunk data[n_threads];
 
     struct timespec start, finish;
