@@ -43,6 +43,7 @@ void *leitor(void *arg)
     sem_post(&mutex); // Libera o mutex
         
     printf("Leitor %d está lendo: %d, %d\n", id, reader_count, writer_count);   
+    
     sleep(1);
 
     sem_wait(&mutex); // Espera o mutex
